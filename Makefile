@@ -6,19 +6,25 @@
 #    By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/19 13:16:00 by ysabik            #+#    #+#              #
-#    Updated: 2026/01/28 14:34:54 by luzog78          ###   ########.fr        #
+#    Updated: 2026/01/28 17:06:34 by luzog78          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= ft_ssl
 
 SRCS		= src/main.c \
+				src/parsing.c \
 				src/md5/md5.c \
 				src/sha256/sha256.c \
-				src/whirlpool/whirlpool.c
+				src/whirlpool/whirlpool.c \
+				src/std/ft_err.c \
+				src/std/ft_strcmp.c \
+				src/std/ft_put.c \
+				src/std/ft_read_content.c \
+				src/std/ft_read_file.c
 BUILD_DIR	= build
 OBJS		= $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
-INCLUDES	= src src/md5 src/sha256 src/whirlpool
+INCLUDES	= src src/md5 src/sha256 src/whirlpool src/std
 
 CC			= gcc
 CFLAGS		= -Wall -Wextra -Werror -g $(addprefix -I, $(INCLUDES))
