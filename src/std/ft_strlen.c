@@ -1,29 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   std.h                                              :+:      :+:    :+:   */
+/*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/28 14:50:16 by luzog78           #+#    #+#             */
-/*   Updated: 2026/01/29 00:02:59 by luzog78          ###   ########.fr       */
+/*   Created: 2026/01/28 18:51:29 by luzog78           #+#    #+#             */
+/*   Updated: 2026/01/28 18:52:11 by luzog78          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef __STD_H
-#define __STD_H
+#include "std.h"
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdint.h>
+size_t	ft_strlen(const char *str)
+{
+	size_t	len;
 
-void	ft_err(const char *prefix, const char *message);
-int		ft_strcmp(const char *s1, const char *s2);
-ssize_t	ft_put(const char *str);
-char	*ft_read_content(int fd);
-char	*ft_read_file(const char *filename);
-size_t	ft_strlen(const char *str);
+	if (!str)
+		return 0;
 
-#endif
+	len = 0;
+	while (str[len])
+		len++;
+	return len;
+}

@@ -6,12 +6,12 @@
 /*   By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:36:03 by luzog78           #+#    #+#             */
-/*   Updated: 2026/01/28 16:46:44 by luzog78          ###   ########.fr       */
+/*   Updated: 2026/01/29 00:02:02 by luzog78          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HEADER_H
-#define HEADER_H
+#ifndef __HEADER_H
+#define __HEADER_H
 
 #include "std.h"
 
@@ -38,9 +38,9 @@ typedef struct ssl_s {
 	char			*string;
 }	ssl_t;
 
-char	*md5_hash(const char *input);
-char	*sha256_hash(const char *input);
-char	*whirlpool_hash(const char *input);
+char	*md5_hash(const char *message);
+char	*sha256_hash(const char *message);
+char	*whirlpool_hash(const char *message);
 
 void	init_ssl(ssl_t *ssl);
 int		parse_flags(ssl_t *ssl, int argc, char **argv, int i);
