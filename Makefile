@@ -6,7 +6,7 @@
 #    By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/19 13:16:00 by ysabik            #+#    #+#              #
-#    Updated: 2026/01/29 00:03:05 by luzog78          ###   ########.fr        #
+#    Updated: 2026/01/29 00:50:35 by luzog78          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,8 @@ SRCS		= src/main.c \
 				src/std/ft_put.c \
 				src/std/ft_read_content.c \
 				src/std/ft_read_file.c \
-				src/std/ft_strlen.c
+				src/std/ft_strlen.c \
+				src/std/ft_512bit_hash_padding.c
 BUILD_DIR	= build
 OBJS		= $(addprefix $(BUILD_DIR)/, $(SRCS:.c=.o))
 INCLUDES	= src src/md5 src/sha256 src/whirlpool src/std

@@ -6,7 +6,7 @@
 /*   By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:37:08 by luzog78           #+#    #+#             */
-/*   Updated: 2026/01/29 00:01:41 by luzog78          ###   ########.fr       */
+/*   Updated: 2026/01/29 00:50:24 by luzog78          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@
 #define MD5_I(B, C, D)	(C ^ (B | ~D))
 #define MD5_LROT(x, c)	((x << c) | (x >> (32 - c)))
 
-uint8_t		*md5_pad(const char *message, size_t *out_len);
 void		md5_process_chunk(const uint8_t *chunk, uint32_t *v0, const uint32_t *S, const uint32_t *K);
 uint32_t	md5_M(const uint8_t *chunk, size_t g);
 char		*md5_build(const uint32_t *v0);
