@@ -6,7 +6,7 @@
 /*   By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:39:40 by luzog78           #+#    #+#             */
-/*   Updated: 2026/01/29 01:14:36 by luzog78          ###   ########.fr       */
+/*   Updated: 2026/01/30 12:56:15 by luzog78          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ char	*sha256_hash(const char *message) {
 	const uint32_t	K[] = { SHA256_K };
 
 	size_t			len;
-	uint8_t			*padded = ft_512bit_hash_padding(message, &len, 0); // big-endian
+	uint8_t			*padded = ft_512bit_hash_padding(message, &len, 8, 0); // 64-bit length, big-endian
 	uint32_t		h[] = {	SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
 							SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7 };
 

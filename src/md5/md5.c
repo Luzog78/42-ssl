@@ -6,7 +6,7 @@
 /*   By: luzog78 <luzog78@gmail.com>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 14:39:40 by luzog78           #+#    #+#             */
-/*   Updated: 2026/01/29 01:13:58 by luzog78          ###   ########.fr       */
+/*   Updated: 2026/01/30 12:55:58 by luzog78          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ char	*md5_hash(const char *message) {
 	const uint32_t	K[] = { MD5_K };
 
 	size_t			len;
-	uint8_t			*padded = ft_512bit_hash_padding(message, &len, 1); // little-endian
+	uint8_t			*padded = ft_512bit_hash_padding(message, &len, 8, 1); // 64-bit length, little-endian
 	uint32_t		v0[] = { MD5_A0, MD5_B0, MD5_C0, MD5_D0 };
 
 	if (!padded)
