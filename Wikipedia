@@ -1,0 +1,519 @@
+{{Short description|Cryptographic hash function}}
+{{Redirect|WHIRLPOOL||Whirlpool (disambiguation)}}
+{{Infobox encryption method
+|name           = Whirlpool
+|image          = 
+|caption        = 
+|designers      = [[Vincent Rijmen]], [[Paulo S. L. M. Barreto]]
+|publish date   = 2000, 2001, 2003
+|series         = 
+|derived from   = [[Square (cipher)|Square]], [[Advanced Encryption Standard|AES]]
+|derived to     = 
+|related to     = 
+|certification  = [[NESSIE]]
+|digest size    = 512 bits
+|key size       =   <!--(block or stream ciphers)-->
+|security claim = Large hashsum size
+|block size     =   <!--(block ciphers)-->
+|state size     =   <!--(stream ciphers)-->
+|structure      = [[Miyaguchi-Preneel]]
+|rounds         = 10
+|cryptanalysis  = In 2009, a [[rebound attack]] was announced that presents full collisions against 4.5 rounds of Whirlpool in 2<sup>120</sup> operations, semi-free-start collisions against 5.5 rounds in 2<sup>120</sup> time and semi-free-start near-collisions against 7.5 rounds in 2<sup>128</sup> time.<ref name="whirlpoolpdf">{{cite conference
+ | author=Florian Mendel1, Christian Rechberger, Martin Schläffer, Søren S. Thomsen
+ | date=2009-02-24
+ | title=The Rebound Attack: Cryptanalysis of Reduced Whirlpool and Grøstl
+ | conference=Fast Software Encryption: 16th International Workshop
+ | url=https://www.cosic.esat.kuleuven.be/fse2009/slides/2402_1150_Schlaeffer.pdf
+ }}</ref>
+}}
+
+In [[computer science]] and [[cryptography]], '''Whirlpool''' (sometimes styled '''WHIRLPOOL''') is a [[cryptographic hash function]]. It was designed by [[Vincent Rijmen]] (co-creator of  the [[Advanced Encryption Standard]]) and [[Paulo S. L. M. Barreto]], who first described it in 2000. It is named after the [[Whirlpool Galaxy|Whirlpool galaxy]] in [[Canes Venatici]] ([[M51 Group|M51]], or [[NGC 5194]]), the first one recognized to have a spiral structure by [[William Parsons, 3rd Earl of Rosse|William Parsons]], third Earl of Rosse, in April 1845<ref name="whirlpoolpdf" />. 
+
+The hash has been recommended by the [[NESSIE]] project. It has also been adopted by the [[International Organization for Standardization]] (ISO) and the [[International Electrotechnical Commission]] (IEC) as part of the joint ISO/IEC 10118-3 [[international standard]].
+
+== Design features ==
+[[File:Messier51 sRGB.jpg|thumb|190px|right|The [[Whirlpool Galaxy]] (M51), which inspired the name of the algorithm.<ref name="whirlpoolpg">{{cite web
+| url=http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html
+| title=The WHIRLPOOL Hash Function
+| author=Paulo S. L. M. Barreto
+| date=2008-11-25
+| archive-url=https://web.archive.org/web/20171129084214/http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html
+| archive-date=2017-11-29
+| url-status=dead
+| access-date=2018-08-09}}</ref>]]
+
+Whirlpool is a hash designed after the [[Square (cipher)|Square]] [[block cipher]], and is considered to be in that family of block cipher functions. 
+
+Whirlpool is a [[One-way compression function#Miyaguchi–Preneel|Miyaguchi–Preneel]] construction based on a substantially modified [[Advanced Encryption Standard]] (AES). 
+
+Whirlpool takes a message of any length less than 2<sup>256</sup> bits and returns a 512-bit [[message digest]].<ref>{{cite journal
+| author1=Barreto, Paulo S. L. M.
+| author2=Rijmen, Vincent
+| name-list-style=amp
+| title=The WHIRLPOOL Hashing Function
+| date=2003-05-24
+| url=http://www.larc.usp.br/~pbarreto/whirlpool.zip
+| format=ZIP
+| archive-url=https://web.archive.org/web/20171026140501/http://www.larc.usp.br/%7Epbarreto/whirlpool.zip
+| archive-date=2017-10-26
+| url-status=dead
+| access-date=2018-08-09}}</ref>
+
+The authors have declared that
+:"WHIRLPOOL is not (and will never be) [[Patent|patented]]. It may be used free of charge for any purpose."<ref name="whirlpoolpg" />
+
+=== Version changes ===
+The original Whirlpool will be called ''Whirlpool-0'', the first revision of Whirlpool will be called ''Whirlpool-T'' and the latest version will be called ''Whirlpool'' in the following test vectors.
+
+* In the first revision in 2001, the [[S-box]] was changed from a randomly generated one with good cryptographic properties to one which has better cryptographic properties and is easier to implement in hardware.
+* In the second revision (2003), a flaw in the [[MDS matrix|diffusion matrix]] was found that lowered the estimated security of the algorithm below its potential.<ref>{{cite journal
+| title=On the diffusion matrix employed in the Whirlpool hashing function
+| author1=Kyoji, Shibutani
+| author2=Shirai, Taizo
+| name-list-style=amp
+| date=2003-03-11
+| url=https://www.cosic.esat.kuleuven.be/nessie/reports/phase2/whirlpool-20030311.pdf
+| access-date=2018-08-09}}
+</ref> Changing the 8x8 rotating matrix constants from (1, 1, 3, 1, 5, 8, 9, 5) to (1, 1, 4, 1, 8, 5, 2, 9) solved this issue.
+
+== Internal structure ==
+The Whirlpool hash function is a [[Merkle–Damgård construction]] based on an [[Advanced Encryption Standard|AES]]-like [[block cipher]] W in [[One-way compression function#Miyaguchi–Preneel|Miyaguchi–Preneel]] mode.<ref name="whirlpoolpg" /> 
+
+The [[block cipher]] <math>W</math> consists of an 8×8 state matrix <math>S</math> of bytes, for a total of 512 bits.
+
+The encryption process consists of updating the state with four round functions over 10 rounds. The four round functions are SubBytes (SB or <math>\gamma</math>), ShiftColumns (SC or <math>\pi</math>), MixRows (MR or <math>\theta</math>) and AddRoundKey (AK or <math>\sigma[k]</math>). During each round the new state is computed as <math>S := \left( AK \circ MR \circ SC \circ SB \right)(S)</math>.
+
+=== SubBytes ===
+The '''SubBytes''' operation applies a non-linear permutation (the S-box) to each byte of the state independently. The 8-bit S-box is composed of 3 smaller 4-bit S-boxes.
+
+=== ShiftColumns ===
+The '''ShiftColumns''' operation cyclically shifts each byte in each column of the state. Column ''j'' has its bytes shifted downwards by ''j'' positions.
+
+=== MixBytesInRows ===
+The '''MixBytesInRows''' operation is a right-multiplication of each row by an 8×8 [[Matrix (mathematics)|matrix]] over <math>GF({2^8})</math>. The matrix is chosen such that the [[branch number]] (an important property when looking at resistance to [[differential cryptanalysis]]) is 9, which is maximal.
+
+=== AddRoundKey ===
+The '''AddRoundKey''' operation uses bitwise [[Exclusive or|xor]] to add a key calculated by the key schedule to the current state. The key schedule is identical to the encryption itself, except the AddRoundKey function is replaced by an '''AddRoundConstant''' function that adds a predetermined constant in each round.
+
+== Complete process of the Whirlpool algorithm ==
+
+Here is the detailed explanation of the Whirlpool [[algorithm]] as described in the official release paper<ref name="whirlpoolpdf" />.
+
+First, let's define the [[Mathematical notation|notation]] used:
+* Every number used is an 8-bit (1 [[byte]]) integer.
+* <math>\{0, 1\}^n</math> is a ''n''-bit [[Bit array|binary string]].
+* <math>\mathcal{M}_{n \times m}</math> is an ''n''-by-''m'' [[Matrix (mathematics)|matrix]] of [[Byte|bytes]].
+* <math>f: A \to B</math> is a function that [[Map (mathematics)|maps]] elements from [[Set (mathematics)|set]] A to [[Set (mathematics)|set]] B.
+* <math>a \oplus b</math> is the bitwise [[Exclusive or|XOR]] of <math>a</math> and <math>b</math>.<br>If <math>a</math> and <math>b</math> are [[Matrix (mathematics)|matrices]], the [[Exclusive or|XOR]] is applied element-wise (<math>a \oplus b = c \ \Leftrightarrow \ c_{i,j} = a_{i,j} \oplus b_{i,j}</math>).
+* <math>f \circ g</math> is the composition function of <math>f</math> and <math>g</math> such that <math>\left(f \circ g\right)\left(x\right) = g\left(f\left(x\right)\right)</math>;
+* <math>{\underset{k=m}\overset{n}{\bigcirc}} \alpha_k, \ \forall \left(m; n; k\right) \in \mathbb{Z}^3, \ m \leq k \leq n</math> is the ascending repetition of <math>\alpha_m \circ \alpha_{m + 1} \circ \ldots \circ \alpha_{n - 1} \circ \alpha_n</math>;
+* <math>{\underset{m}\overset{k=n}{\bigcirc}} \alpha_k, \ \forall \left(m; n; k\right) \in \mathbb{Z}^3, \ m \leq k \leq n</math> is the descending repetition of <math>\alpha_n \circ \alpha_{n - 1} \circ \ldots \circ \alpha_{m + 1} \circ \alpha_m</math>.
+
+=== Whirlpool algorithm ===
+The message <math>M</math> that is to be hashed is first [[Padding (cryptography)|padded]] to ensure its length is a multiple of the block size (512 bits). This is done using the standard [[Padding (cryptography)|padding]] scheme defined in the [https://cdn.standards.iteh.ai/samples/64213/4902e1c6ea75432bbd41eb2c17b76e59/ISO-IEC-10118-1-2016.pdf ISO/IEC 10118-1] standard (the same used for [[MD5|md5]], [[SHA-2|sha-2]], and others):
+
+# Append a '1' bit;
+# Append as many '0' bits as needed for the length to reach a multiple of 256 (<math>512-256</math>);
+# Append the original length of the message in bits using 256-bit [[Endianness|big-endian]] format.
+
+Then, the padded message is divided into <math>t</math> 512-bit blocks <math>m_i</math>, <math>1 \leq i \leq t</math>.
+
+Whirlpool iterates the [[One-way compression function|Miyaguchi-Preneel]] hashing scheme over these blocks <sup>[sections 3.11 and 3.12]</sup><ref name="whirlpoolpdf" />:
+
+<math>\begin{align}
+& \begin{align}
+\eta_i & = \mu\left(m_i\right), \\
+H_0 & = \mu\left(IV\right), \\
+H_i & = W\left[H_{i-1}\right]\left(\eta_i\right) \oplus H_{i-1} \oplus \eta_i, \ 1 \leq i \leq t \\
+\end{align} \\
+& \text{Whirlpool}\left(M\right) \equiv \mu^{-1}\left(H_t\right)
+\end{align}</math>
+
+Where:
+* <math>\mu: \{0, 1\}^{512} \to \mathcal{M}_{8 \times 8}</math> is the [[Bit array|string]] to [[Matrix (mathematics)|matrix]] conversion function;
+* <math>\mu^{-1}: \mathcal{M}_{8 \times 8} \to \{0, 1\}^{512}</math> is the [[Matrix (mathematics)|matrix]] to [[Bit array|string]] conversion function;
+* <math>IV</math> is the ''initialization vector'', a [[Bit array|string]] of 512 0-bits;
+* <math>W</math> is the Whirlpool cipher function.
+
+=== Cipher W ===
+The internal block cipher function <math>W\left[\mathcal{M}_{8 \times 8}\right]: \mathcal{M}_{8 \times 8} \to \mathcal{M}_{8 \times 8}</math> <sup>[section 3.9]</sup><ref name="whirlpoolpdf" /> operates on and returns an 8x8 [[Matrix (mathematics)|matrix]]:
+
+<math>
+\begin{align}
+W\left[K\right] = \left( {\underset{1}\overset{r=R}{\bigcirc}} \rho\left[K_r\right] \right) \circ \sigma\left[K_0\right]
+\end{align}
+</math>
+
+Where:
+* <math>R</math> is the number of rounds (the standard Whirlpool uses <math>R = 10</math>);
+* <math>K_n</math> is the ''nth'' key of the <math>K</math> key schedule;
+* <math>\rho</math> is the round function.
+
+The key schedule expands the key <math>K \in \mathcal{M}_{8 \times 8}</math> into a [[sequence]] of keys <math>K_r \in \mathcal{M}_{8 \times 8}, \ 0 \leq r \leq R</math> <sup>[section 3.8]</sup><ref name="whirlpoolpdf" />:
+
+<math>\begin{align}
+K_0 & = K, \\
+K_r & = \rho\left[c^r\right]\left(K_{r-1}\right), \ 1 \leq r \leq R \\
+\end{align}</math>
+
+Where:
+* <math>c^r \in \mathcal{M}_{8 \times 8}</math> is the ''rth'' round constant [[Matrix (mathematics)|matrix]].<br>
+
+The round constant for the ''rth'' round, <math>r > 0</math>, is a [[Matrix (mathematics)|matrix]] <math>c^r \in \mathcal{M}_{8 \times 8}</math>, defined as:
+
+<math>
+\begin{align}
+c^r_{0, j} & = S\left[8\left(r - 1\right) + j\right], & 0 \leq j < 8 \\
+c^r_{i, j} & = 0, & 1 \leq i < 8, 0 \leq j < 8 \\
+\end{align}
+</math>
+
+Where:
+* <math>S \in \mathcal{M}_{16 \times 16}</math> is the S-box.
+
+=== Round function ρ ===
+The round function <math>\rho\left[\mathcal{M}_{8 \times 8}\right]: \mathcal{M}_{8 \times 8} \to \mathcal{M}_{8 \times 8}</math> <sup>[section 3.7]</sup><ref name="whirlpoolpdf" /> is defined as:
+
+<math>
+\begin{align}
+\rho\left[k\right] & = \sigma\left[k\right] \circ \theta \circ \pi \circ \gamma \\
+                   & _{\left( = \ AK \ \circ \ MR \ \circ \ SC \ \circ \ SB \right)} \\
+\end{align}
+</math>
+
+Where:
+* <math>\gamma</math> is the non-linear layer;
+* <math>\pi</math> is the cyclical [[permutation]];
+* <math>\theta</math> is the diffusion layer;
+* <math>\sigma</math> is the key addition.
+
+==== Non-linear layer γ (SubBytes) ====
+The function <math>\gamma: \mathcal{M}_{8 \times 8} \to \mathcal{M}_{8 \times 8}</math> consists of the parallel application of a non-linear [[Substitution (logic)|substitution]] <math>\psi: x_{\text{(Byte)}} \to S\left[x\right]_{\text{(Byte)}}</math> to each [[Byte|bytes]] of the argument independently <sup>[section 3.2]</sup><ref name="whirlpoolpdf" />:
+
+<math>
+\begin{align}
+\gamma\left(a\right) = b \ \Leftrightarrow \ b_{i, j} = S\left[a_{i, j}\right], \ 0 \leq i < 8, \ 0 \leq j < 8, \\
+\end{align}
+</math>
+
+==== Cyclical permutation π (ShiftColumns) ====
+The [[permutation]] <math>\pi : \mathcal{M}_{8 \times 8} \to \mathcal{M}_{8 \times 8}</math> cyclically shifts each column of its argument independently, so that column <math>j</math> is shifted downwards by <math>j</math> positions <sup>[section 3.3]</sup><ref name="whirlpoolpdf" />:
+
+<math>
+\begin{align}
+\pi\left(a\right) = b \ \Leftrightarrow \ b_{i, j} = a_{\left( \left(i - j\right) \ \text{mod} \ 8 \right), \ j}, \ 0 \leq i < 8, \ 0 \leq j < 8 \\
+\end{align}
+</math>
+
+==== Diffusion layer θ (MixBytesInRows) ====
+The linear diffusion layer <math>\theta: \mathcal{M}_{8 \times 8} \to \mathcal{M}_{8 \times 8}</math> is a linear [[Map (mathematics)|mapping]] based on the [[Circulant matrix|circular matrix]] <math>C = \text{cir}\left(01_{(16)}, 01_{(16)}, 04_{(16)}, 01_{(16)}, 08_{(16)}, 05_{(16)}, 02_{(16)}, 09_{(16)}\right)</math> <sup>[section 3.4]</sup><ref name="whirlpoolpdf" />:
+
+<math>
+\begin{align}
+\theta\left(a\right) = a \cdot C, \ 0 \leq i < 8, \ 0 \leq j < 8 \\
+\end{align}
+</math><br>
+
+A [[circulant matrix]] <math>C\in\mathcal{M}_{n\times n}</math> is defined as a matrix where each row is a cyclic shift of the previous row <sup>[section 2.2]</sup><ref name="whirlpoolpdf" />. Formally, a [[circulant matrix]] can be represented as:
+
+<math>
+\begin{align}
+& \text{cir}(a_0, a_1, \ldots, a_{n-1}) =
+    \begin{pmatrix}
+    a_0 & a_1 & a_2 & \cdots & a_{n-1} \\
+    a_{n-1} & a_0 & a_1 & \cdots & a_{n-2} \\
+    a_{n-2} & a_{n-1} & a_0 & \cdots & a_{n-3} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    a_1 & a_2 & a_3 & \cdots & a_0 \\
+    \end{pmatrix}, \ \forall a_n \in \mathbb{F}_{2^8}, \ n \in \mathbb{N} \\
+& \text{or simply} \\
+& \text{cir}(a_0, a_1, \ldots, a_{n-1}) = c \ \Leftrightarrow \ c_{i, j} = a_{\left(i - j\right) \ \text{mod} \ 8}, \ 0 \leq i < 8, \ 0 \leq j < 8, \ \forall a_n \in \mathbb{F}_{2^8}, \ n \in \mathbb{N} \\
+\end{align}
+</math><br>
+
+For example, [[circulant matrix]] <math>C = \text{cir}\left(01_{(16)}, 01_{(16)}, 04_{(16)}, 01_{(16)}, 08_{(16)}, 05_{(16)}, 02_{(16)}, 09_{(16)}\right)</math> is the [[Matrix (mathematics)|matrix]]:
+
+<math>
+\begin{align}
+C =
+    \begin{pmatrix}
+    01_{(16)} & 01_{(16)} & 04_{(16)} & 01_{(16)} & 08_{(16)} & 05_{(16)} & 02_{(16)} & 09_{(16)} \\
+    09_{(16)} & 01_{(16)} & 01_{(16)} & 04_{(16)} & 01_{(16)} & 08_{(16)} & 05_{(16)} & 02_{(16)} \\
+    02_{(16)} & 09_{(16)} & 01_{(16)} & 01_{(16)} & 04_{(16)} & 01_{(16)} & 08_{(16)} & 05_{(16)} \\
+    05_{(16)} & 02_{(16)} & 09_{(16)} & 01_{(16)} & 01_{(16)} & 04_{(16)} & 01_{(16)} & 08_{(16)} \\
+    08_{(16)} & 05_{(16)} & 02_{(16)} & 09_{(16)} & 01_{(16)} & 01_{(16)} & 04_{(16)} & 01_{(16)} \\
+    01_{(16)} & 08_{(16)} & 05_{(16)} & 02_{(16)} & 09_{(16)} & 01_{(16)} & 01_{(16)} & 04_{(16)} \\
+    04_{(16)} & 01_{(16)} & 08_{(16)} & 05_{(16)} & 02_{(16)} & 09_{(16)} & 01_{(16)} & 01_{(16)} \\
+    01_{(16)} & 04_{(16)} & 01_{(16)} & 08_{(16)} & 05_{(16)} & 02_{(16)} & 09_{(16)} & 01_{(16)} \\
+    \end{pmatrix} \\
+\end{align}
+</math>
+
+==== Key addition σ (AddRoundKey) ====
+The affine key addition <math>\sigma\left[\mathcal{M}_{8 \times 8}\right]: \mathcal{M}_{8 \times 8} \to \mathcal{M}_{8 \times 8}</math> consists of the bitwise [[Exclusive or|XOR]] of a key [[Matrix (mathematics)|matrix]] <math>k \in \mathcal{K}_{8 \times 8}</math>:
+
+<math>\begin{align}
+\sigma\left[k\right]\left(a\right) = a \oplus k \\
+\end{align}</math>
+
+=== Substitution box S (S-Box) ===
+The S-Box <math>S \in \mathcal{M}_{16 \times 16}</math> is typically represented as a [[lookup table]], where each input [[byte]] is mapped to a corresponding output [[byte]]. It can be computed using optimal diffusion mapping generation techniques<sup>[section 2.4]</sup><ref name="whirlpoolpdf" /> but here is a [[Matrix (mathematics)|matrix]] representation of it:<small><math>
+\begin{align}
+& S =
+    \begin{pmatrix}
+    18_{(16)} & 23_{(16)} & c6_{(16)} & e8_{(16)} & 87_{(16)} & b8_{(16)} & 01_{(16)} & 4f_{(16)} & 36_{(16)} & a6_{(16)} & d2_{(16)} & f5_{(16)} & 79_{(16)} & 6f_{(16)} & 91_{(16)} & 52_{(16)} \\
+    60_{(16)} & bc_{(16)} & 9b_{(16)} & 8e_{(16)} & a3_{(16)} & 0c_{(16)} & 7b_{(16)} & 35_{(16)} & 1d_{(16)} & e0_{(16)} & d7_{(16)} & c2_{(16)} & 2e_{(16)} & 4b_{(16)} & fe_{(16)} & 57_{(16)} \\
+    15_{(16)} & 77_{(16)} & 37_{(16)} & e5_{(16)} & 9f_{(16)} & f0_{(16)} & 4a_{(16)} & da_{(16)} & 58_{(16)} & c9_{(16)} & 29_{(16)} & 0a_{(16)} & b1_{(16)} & a0_{(16)} & 6b_{(16)} & 85_{(16)} \\
+    bd_{(16)} & 5d_{(16)} & 10_{(16)} & f4_{(16)} & cb_{(16)} & 3e_{(16)} & 05_{(16)} & 67_{(16)} & e4_{(16)} & 27_{(16)} & 41_{(16)} & 8b_{(16)} & a7_{(16)} & 7d_{(16)} & 95_{(16)} & d8_{(16)} \\
+    fb_{(16)} & ee_{(16)} & 7c_{(16)} & 66_{(16)} & dd_{(16)} & 17_{(16)} & 47_{(16)} & 9e_{(16)} & ca_{(16)} & 2d_{(16)} & bf_{(16)} & 07_{(16)} & ad_{(16)} & 5a_{(16)} & 83_{(16)} & 33_{(16)} \\
+    63_{(16)} & 02_{(16)} & aa_{(16)} & 71_{(16)} & c8_{(16)} & 19_{(16)} & 49_{(16)} & d9_{(16)} & f2_{(16)} & e3_{(16)} & 5b_{(16)} & 88_{(16)} & 9a_{(16)} & 26_{(16)} & 32_{(16)} & b0_{(16)} \\
+    e9_{(16)} & 0f_{(16)} & d5_{(16)} & 80_{(16)} & be_{(16)} & cd_{(16)} & 34_{(16)} & 48_{(16)} & ff_{(16)} & 7a_{(16)} & 90_{(16)} & 5f_{(16)} & 20_{(16)} & 68_{(16)} & 1a_{(16)} & ae_{(16)} \\
+    b4_{(16)} & 54_{(16)} & 93_{(16)} & 22_{(16)} & 64_{(16)} & f1_{(16)} & 73_{(16)} & 12_{(16)} & 40_{(16)} & 08_{(16)} & c3_{(16)} & ec_{(16)} & db_{(16)} & a1_{(16)} & 8d_{(16)} & 3d_{(16)} \\
+    97_{(16)} & 00_{(16)} & cf_{(16)} & 2b_{(16)} & 76_{(16)} & 82_{(16)} & d6_{(16)} & 1b_{(16)} & b5_{(16)} & af_{(16)} & 6a_{(16)} & 50_{(16)} & 45_{(16)} & f3_{(16)} & 30_{(16)} & ef_{(16)} \\
+    3f_{(16)} & 55_{(16)} & a2_{(16)} & ea_{(16)} & 65_{(16)} & ba_{(16)} & 2f_{(16)} & c0_{(16)} & de_{(16)} & 1c_{(16)} & fd_{(16)} & 4d_{(16)} & 92_{(16)} & 75_{(16)} & 06_{(16)} & 8a_{(16)} \\
+    b2_{(16)} & e6_{(16)} & 0e_{(16)} & 1f_{(16)} & 62_{(16)} & d4_{(16)} & a8_{(16)} & 96_{(16)} & f9_{(16)} & c5_{(16)} & 25_{(16)} & 59_{(16)} & 84_{(16)} & 72_{(16)} & 39_{(16)} & 4c_{(16)} \\
+    5e_{(16)} & 78_{(16)} & 38_{(16)} & 8c_{(16)} & d1_{(16)} & a5_{(16)} & e2_{(16)} & 61_{(16)} & b3_{(16)} & 21_{(16)} & 9c_{(16)} & 1e_{(16)} & 43_{(16)} & c7_{(16)} & fc_{(16)} & 04_{(16)} \\
+    51_{(16)} & 99_{(16)} & 6d_{(16)} & 0d_{(16)} & fa_{(16)} & df_{(16)} & 7e_{(16)} & 24_{(16)} & 3b_{(16)} & ab_{(16)} & ce_{(16)} & 11_{(16)} & 8f_{(16)} & 4e_{(16)} & b7_{(16)} & eb_{(16)} \\
+    3c_{(16)} & 81_{(16)} & 94_{(16)} & f7_{(16)} & b9_{(16)} & 13_{(16)} & 2c_{(16)} & d3_{(16)} & e7_{(16)} & 6e_{(16)} & c4_{(16)} & 03_{(16)} & 56_{(16)} & 44_{(16)} & 7f_{(16)} & a9_{(16)} \\
+    2a_{(16)} & bb_{(16)} & c1_{(16)} & 53_{(16)} & dc_{(16)} & 0b_{(16)} & 9d_{(16)} & 6c_{(16)} & 31_{(16)} & 74_{(16)} & f6_{(16)} & 46_{(16)} & ac_{(16)} & 89_{(16)} & 14_{(16)} & e1_{(16)} \\
+    16_{(16)} & 3a_{(16)} & 69_{(16)} & 09_{(16)} & 70_{(16)} & b6_{(16)} & d0_{(16)} & ed_{(16)} & cc_{(16)} & 42_{(16)} & 98_{(16)} & a4_{(16)} & 28_{(16)} & 5c_{(16)} & f8_{(16)} & 86_{(16)} \\
+    \end{pmatrix} \\
+\end{align}
+</math></small>
+
+== Whirlpool hashes ==
+The Whirlpool algorithm has undergone two revisions since its original 2000 specification.
+
+People incorporating Whirlpool will most likely use the most recent revision of Whirlpool; while there are no known security weaknesses in earlier versions of Whirlpool, the most recent revision has better hardware implementation efficiency characteristics, and is also likely to be more secure. As mentioned earlier, it is also the version adopted in the ISO/IEC 10118-3 [[international standard]].
+
+The 512-bit (64-byte) Whirlpool hashes (also termed ''message digests'') are typically represented as 128-digit [[hexadecimal]] numbers.<br />
+The following demonstrates a 43-byte [[ASCII]] input (not including quotes) and the corresponding Whirlpool hashes:
+
+{| class="wikitable"
+|-
+! Version !! Input String !! Computed Hash
+|-
+| Whirlpool-0 || style="text-align: center;width:22em;"| ''"''[[The quick brown fox jumps over the lazy dog]]''"'' ||
+  4F8F5CB531E3D49A61CF417CD133792CCFA501FD8DA53EE368FED20E5FE0248C
+  3A0B64F98A6533CEE1DA614C3A8DDEC791FF05FEE6D971D57C1348320F4EB42D
+|-
+| Whirlpool-T || style="text-align: center;width:22em;"| ''"''The quick brown fox jumps over the lazy dog''"'' ||
+  3CCF8252D8BBB258460D9AA999C06EE38E67CB546CFFCF48E91F700F6FC7C183
+  AC8CC3D3096DD30A35B01F4620A1E3A20D79CD5168544D9E1B7CDF49970E87F1
+|-
+| Whirlpool || style="text-align: center;width:22em;"| ''"''The quick brown fox jumps over the lazy dog''"'' ||
+  B97DE512E91E3828B40D2B0FDCE9CEB3C4A71F9BEA8D88E75C4FA854DF36725F
+  D2B52EB6544EDCACD6F8BEDDFEA403CB55AE31F03AD62A5EF54E42EE82C3FB35
+|}
+
+== Implementations ==
+The authors provide [[reference implementation]]s of the Whirlpool algorithm, including a version written in [[C (programming language)|C]] and a version written in [[Java (programming language)|Java]].<ref name="whirlpoolpg" /> These reference implementations have been released into the public domain.<ref name="whirlpoolpg" />
+
+Research on the security analysis of the Whirlpool function however, has revealed that on average, the introduction of 8 random faults is sufficient to compromise the 512-bit Whirlpool hash message being processed and the secret key of HMAC-Whirlpool within the context of Cloud of Things (CoTs). This emphasizes the need for increased security measures in its implementation.<ref>Li, W., Gao, Z., Gu, D., Ge, C., Liao, L., Zhou, Z., Liu, Y., & Liu, Z. (2017). Security Analysis of the Whirlpool Hash Function in the Cloud of Things. KSII Transactions on Internet and Information Systems, 11(1), 536–551. https://doi.org/10.3837/tiis.2017.01.028</ref>
+
+=== Pseudo-code ===
+Here is an implementation example of the standard Whirlpool [[algorithm]]:
+ <small>S :=  0x18, 0x23, 0xc6, 0xe8, 0x87, 0xb8, 0x01, 0x4f, 0x36, 0xa6, 0xd2, 0xf5, 0x79, 0x6f, 0x91, 0x52, \
+       0x60, 0xbc, 0x9b, 0x8e, 0xa3, 0x0c, 0x7b, 0x35, 0x1d, 0xe0, 0xd7, 0xc2, 0x2e, 0x4b, 0xfe, 0x57, \
+       0x15, 0x77, 0x37, 0xe5, 0x9f, 0xf0, 0x4a, 0xda, 0x58, 0xc9, 0x29, 0x0a, 0xb1, 0xa0, 0x6b, 0x85, \
+       0xbd, 0x5d, 0x10, 0xf4, 0xcb, 0x3e, 0x05, 0x67, 0xe4, 0x27, 0x41, 0x8b, 0xa7, 0x7d, 0x95, 0xd8, \
+       0xfb, 0xee, 0x7c, 0x66, 0xdd, 0x17, 0x47, 0x9e, 0xca, 0x2d, 0xbf, 0x07, 0xad, 0x5a, 0x83, 0x33, \
+       0x63, 0x02, 0xaa, 0x71, 0xc8, 0x19, 0x49, 0xd9, 0xf2, 0xe3, 0x5b, 0x88, 0x9a, 0x26, 0x32, 0xb0, \
+       0xe9, 0x0f, 0xd5, 0x80, 0xbe, 0xcd, 0x34, 0x48, 0xff, 0x7a, 0x90, 0x5f, 0x20, 0x68, 0x1a, 0xae, \
+       0xb4, 0x54, 0x93, 0x22, 0x64, 0xf1, 0x73, 0x12, 0x40, 0x08, 0xc3, 0xec, 0xdb, 0xa1, 0x8d, 0x3d, \
+       0x97, 0x00, 0xcf, 0x2b, 0x76, 0x82, 0xd6, 0x1b, 0xb5, 0xaf, 0x6a, 0x50, 0x45, 0xf3, 0x30, 0xef, \
+       0x3f, 0x55, 0xa2, 0xea, 0x65, 0xba, 0x2f, 0xc0, 0xde, 0x1c, 0xfd, 0x4d, 0x92, 0x75, 0x06, 0x8a, \
+       0xb2, 0xe6, 0x0e, 0x1f, 0x62, 0xd4, 0xa8, 0x96, 0xf9, 0xc5, 0x25, 0x59, 0x84, 0x72, 0x39, 0x4c, \
+       0x5e, 0x78, 0x38, 0x8c, 0xd1, 0xa5, 0xe2, 0x61, 0xb3, 0x21, 0x9c, 0x1e, 0x43, 0xc7, 0xfc, 0x04, \
+       0x51, 0x99, 0x6d, 0x0d, 0xfa, 0xdf, 0x7e, 0x24, 0x3b, 0xab, 0xce, 0x11, 0x8f, 0x4e, 0xb7, 0xeb, \
+       0x3c, 0x81, 0x94, 0xf7, 0xb9, 0x13, 0x2c, 0xd3, 0xe7, 0x6e, 0xc4, 0x03, 0x56, 0x44, 0x7f, 0xa9, \
+       0x2a, 0xbb, 0xc1, 0x53, 0xdc, 0x0b, 0x9d, 0x6c, 0x31, 0x74, 0xf6, 0x46, 0xac, 0x89, 0x14, 0xe1, \
+       0x16, 0x3a, 0x69, 0x09, 0x70, 0xb6, 0xd0, 0xed, 0xcc, 0x42, 0x98, 0xa4, 0x28, 0x5c, 0xf8, 0x86
+ 
+ C :=  0x01, 0x01, 0x04, 0x01, 0x08, 0x05, 0x02, 0x09, \
+       0x09, 0x01, 0x01, 0x04, 0x01, 0x08, 0x05, 0x02, \
+       0x02, 0x09, 0x01, 0x01, 0x04, 0x01, 0x08, 0x05, \
+       0x05, 0x02, 0x09, 0x01, 0x01, 0x04, 0x01, 0x08, \
+       0x08, 0x05, 0x02, 0x09, 0x01, 0x01, 0x04, 0x01, \
+       0x01, 0x08, 0x05, 0x02, 0x09, 0x01, 0x01, 0x04, \
+       0x04, 0x01, 0x08, 0x05, 0x02, 0x09, 0x01, 0x01, \
+       0x01, 0x04, 0x01, 0x08, 0x05, 0x02, 0x09, 0x01
+ 
+ # Matrix built from initialization vector
+ IM := 0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0, \
+       0, 0, 0, 0, 0, 0, 0, 0
+ 
+ R :=  10
+ 
+ func getConstantRoundMatrix(r)
+     cr := IM
+     for j from 0 to 7
+         cr[j] := S[8 * (r - 1) + j]
+     endfor
+     return cr
+ endfunc
+ 
+ func whirlpoolRound(matrix, key)
+     # Apply the non-linear transformation γ
+     for i from 0 to 7
+         for j from 0 to 7
+             matrix[i * 8 + j] = S[matrix[i * 8 + j]]
+         endfor
+     endfor
+ 
+     # Apply cyclical permutation π
+     tmp := matrix
+     for i from 0 to 7
+         for j from 0 to 7
+             # '+ 8' to prevent negative indices
+             matrix[i * 8 + j] = tmp[((i - j + 8) % 8) * 8 + j]
+         endfor
+     endfor
+     matrix := tmp
+ 
+     # Apply linear diffusion θ
+     matrix := dotProduct(matrix, C)
+ 
+     # Apply key addition σ[key]
+     matrix := matrix xor key
+     return matrix
+ endfunc
+ 
+ func whirlpool(M)
+     m, t := pad(M)  # Returns (paddedMessageDividedInChunks, amountOfChunks)
+     H := IM
+ 
+     for i from 0 to t
+         W := m[t]
+         Kr := H
+ 
+         W := W xor H
+         for r from 1 to R
+             cr := getConstantRoundMatrix(r)
+             Kr := whirlpoolRound(Kr, cr)
+             W := whirlpoolRound(W, Kr)
+         endfor
+ 
+         H := H xor W
+         H := H xor m[t]
+     endfor
+     return matrixToHexString(H)
+ endfunc</small>
+For the linear-diffusion <math>\theta</math>, a [[matrix multiplication]] is required. [[Galois Field]] arithmetic can be used to write this [[Matrix multiplication algorithm|multiplication algorithm]]:
+ <small>func dotProduct(A, B)
+     tmp: Matrix
+ 
+     for i from 0 to 7
+         for j from 0 to 7
+             tmp[i * 8 + j] := 0
+ 
+             for k from 0 to 7
+                 # Galois Field (2^8) multiplication
+                 a := A[i * 8 + k];
+                 b := B[k * 8 + j];
+                 product := 0;
+ 
+                 while b > 0
+                     if b & 1 == 1
+                         product := product xor a
+                     endif
+                     if a & 0x80 != 0
+                         a := (a << 1) xor 0x11d  # x^8 + x^4 + x^3 + x^2 + 1
+                     else
+                         a := a << 1
+                     endif
+                     b := b >> 1
+                 endwhile
+                 tmp[i * 8 + j] := tmp[i * 8 + j] xor product
+             endfor
+         endfor
+     endfor
+     return tmp
+ endfunc</small>
+Here is an implementation of the 512-bit (64-bits size, [[Endianness|big-endian]]) [[Padding (cryptography)|padding]]:
+ <small>func pad(M)
+     original_length := len(M)  # In bytes
+ 
+     # 512 bits (total length) - 256 bits (size length) - 1 bit (padding bit)
+     #  64 bytes               -  32 bytes              - 1 byte = 31 bytes
+     padding := (31 - original_length) % 64
+     padding := (padding + 64) % 64  # Avoid negative padding
+ 
+     total_length := original_length + 1 + padding + 32  # In bytes
+     padded: Byte[total_length]
+ 
+     # Copy original message
+     for i from 0 to original_length - 1
+         padded[i] := M[i]
+     endfor
+ 
+     padded[original_length] := 0x80  # Append the '1' bit, then 7 '0' bits
+     for i from original_length + 1 to original_length + padding
+         padded[i] := 0x00  # Append 8 '0' bits
+     endfor
+ 
+     for i from 0 to 31
+         padded[total_length - 32 + i] := (original_length * 8) >> (8 * (31 - i)) & 0xff
+     endfor
+ 
+     chunk_amount := total_length / 64
+     divided := Byte[chunk_amount][64]
+     for i from 0 to chunk_amount - 1
+         for j from 0 to 63
+             divided[i][j] := padded[i * 64 + j]
+         endfor
+     endfor
+     return divided, chunk_amount
+ endfunc</small>
+And here is an example of a [[Matrix (mathematics)|matrix]]-to-[[String (computer science)|string]] conversion:
+ <small>func matrixToHexString(matrix)
+     HEX := "0123456789abcdef"
+     result: Byte[128]
+     for i from 0 to 63
+         byte := matrix[i]
+         result[i * 2] := HEX[byte >> 4]
+         result[i * 2 + 1] := HEX[byte & 0xf]
+     endfor
+     return result
+ endfunc</small>
+
+== Adoption ==
+Two of the first widely used mainstream cryptographic programs that started using Whirlpool were [[FreeOTFE]], followed by [[TrueCrypt]] in 2005.{{Citation needed|date=February 2018}}
+
+[[VeraCrypt]] (a fork of [[TrueCrypt]]) included Whirlpool (the final version) as one of its supported hash algorithms.<ref>{{cite web
+| url=https://www.veracrypt.fr/en/Whirlpool.html
+| title=Whirlpool
+| work=VeraCrypt Documentation
+| publisher=IDRIX
+| access-date=2018-08-09}}</ref>
+
+== See also ==
+* [[Digital timestamping]]
+
+== References ==
+{{reflist}}
+
+== External links ==
+* {{webarchive |url=https://web.archive.org/web/20171129084214/http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html |date=2017-11-29 | title=The WHIRLPOOL Hash Function}}
+* {{SourceForge|jacksum|Jacksum}}, a Java implementation of all three revisions of Whirlpool
+* {{Github|jzelinskie/whirlpool}} – An open source [[Go_(programming_language)|Go]] implementation of the latest revision of Whirlpool
+* [https://web.archive.org/web/20120219054743/http://www.karljapetre.com/whirlpool/ A Matlab Implementation of the Whirlpool Hashing Function]
+* [https://rhash.sourceforge.net/ RHash], an [[open source]] command-line tool, which can calculate and verify Whirlpool hash.
+* [https://metacpan.org/pod/Digest::Whirlpool Perl Whirlpool] module at [[CPAN]]
+* [https://rubygems.org/gems/digest-whirlpool Digest module] implementing the Whirlpool hashing algorithm in [[Ruby_(programming_language)|Ruby]]
+* [http://method-combination.net/lisp/ironclad/ Ironclad] a [[Common Lisp]] cryptography package containing a Whirlpool implementation
+* [https://www.iso.org/standard/39876.html The ISO/IEC 10118-3:2004 standard]
+* [https://www.cosic.esat.kuleuven.be/nessie/testvectors/hash/whirlpool/index.html Test vectors for the Whirlpool hash] from the [[NESSIE]] project
+* [http://csharptest.net/browse/src/Library/Crypto/WhirlpoolManaged.cs Managed C# implementation]
+* [https://pypi.org/project/Whirlpool/ Python Whirlpool module]
+
+{{Cryptography navbox | hash|state=uncollapsed}}
+{{ISO standards}}
+
+[[Category:Cryptographic hash functions]]
